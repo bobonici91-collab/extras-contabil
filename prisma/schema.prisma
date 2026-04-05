@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String?
+  passwordHash String
+  companyName  String?
+  cui          String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  subscription Subscription?
+  uploads      FileUpload[]
+  auditLogs    AuditLog[]
+}
+
+model Subscription {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id])
+  stripeCustomerId  String    @unique
+  stripeSubId       String?   @unique
+  status            String    @default("trialing")
+  plan              String    @default("standard")
+  trialEndsAt       DateTime?
+  currentPeriodEnd  DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model FileUpload {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  originalName  String
+  bankType      String
+  fileFormat    String
+  fileSize      Int
+  encryptedPath String
+  iv            String
+  authTag       String
+  status        String   @default("uploaded")
+  parsedData    String?
+  exportCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  detail    String?
+  ip        String?
+  createdAt DateTime @default(now())
+}
