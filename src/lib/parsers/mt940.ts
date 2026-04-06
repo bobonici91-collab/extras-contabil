@@ -7,7 +7,7 @@ const TAG_PATTERNS = {
   accountId: /^:25:(.+)$/,
   statementNumber: /^:28C:(.+)$/,
   openingBalance: /^:60[FM]:([CD])(\d{6})([A-Z]{3})([\d,]+)$/,
-  statementLine: /^:61:(\d{6})(\d{4})?([CD]R?)([\d,]+)([A-Z]\d{3})(.*)$/,
+  statementLine: /^:61:(\d{6})(\d{4})?([CD]R?)([\d,]+)([A-Z][A-Z0-9]{3})(.*)$/,
   information: /^:86:(.+)$/,
   closingBalance: /^:62[FM]:([CD])(\d{6})([A-Z]{3})([\d,]+)$/,
   availableBalance: /^:64:([CD])(\d{6})([A-Z]{3})([\d,]+)$/,
@@ -133,14 +133,51 @@ export class MT940Parser implements BankParser {
       const infoMatch = trimmed.match(TAG_PATTERNS.information);
       if (infoMatch && currentTransaction) {
         const info = infoMatch[1].trim();
-        currentTransaction.description = currentTransaction.description
-          ? currentTransaction.description + ' ' + info
-          : info;
 
-        // Try to extract counterparty IBAN from description
-        const ibanInDesc = info.match(/RO\d{2}[A-Z]{4}[A-Z0-9]{16}/);
-        if (ibanInDesc && !currentTransaction.iban) {
-          currentTransaction.iban = ibanInDesc[0];
+        // Parse SWIFT sub-fields (^20=description, ^30=bank, ^31=IBAN, ^32/^33=counterparty)
+        const subFields = info.replace(/^000/, '').split('^').filter(Boolean);
+        let description = '';
+        let counterparty = '';
+
+        for (const field of subFields) {
+          const code = field.substring(0, 2);
+          const value = field.substring(2).trim();
+
+          if (code === '20' || code === '21' || code === '22' || code === '23') {
+            description += value + ' ';
+          } else if (code === '31') {
+            // IBAN
+            const ibanClean = value.replace(/\s/g, '');
+            const ibanMatch = ibanClean.match(/RO\d{2}[A-Z]{4}[A-Z0-9]{16}/);
+            if (ibanMatch && !currentTransaction.iban) {
+              currentTransaction.iban = ibanMatch[0];
+            }
+          } else if (code === '32' || code === '33') {
+            counterparty += value + ' ';
+          }
+        }
+
+        if (description.trim()) {
+          currentTransaction.description = currentTransaction.description
+            ? currentTransaction.description + ' ' + description.trim()
+            : description.trim();
+        } else {
+          // Fallback: use raw info if no sub-fields parsed
+          currentTransaction.description = currentTransaction.description
+            ? currentTransaction.description + ' ' + info
+            : info;
+        }
+
+        if (counterparty.trim() && !currentTransaction.counterparty) {
+          currentTransaction.counterparty = counterparty.trim();
+        }
+
+        // Fallback IBAN extraction from raw text
+        if (!currentTransaction.iban) {
+          const ibanInDesc = info.match(/RO\d{2}[A-Z]{4}[A-Z0-9]{16}/);
+          if (ibanInDesc) {
+            currentTransaction.iban = ibanInDesc[0];
+          }
         }
         continue;
       }
