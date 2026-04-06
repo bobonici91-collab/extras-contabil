@@ -88,7 +88,7 @@ export const ro = {
       'Validare avansata cu reconciliere sold',
       'Suport prioritar',
     ],
-    trial: '14 zile gratuit',
+    trial: '3 zile gratuit (max 3 fisiere)',
     subscribe: 'Activeaza Abonament',
     manage: 'Gestioneaza Abonament',
     active: 'Activ',

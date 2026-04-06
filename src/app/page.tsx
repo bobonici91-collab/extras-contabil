@@ -84,7 +84,7 @@ export default function LandingPage() {
               href="/register"
               className="bg-white text-blue-700 px-8 py-3 rounded-lg font-bold text-lg hover:bg-blue-50 transition shadow-lg"
             >
-              14 Zile Gratuit
+              3 Zile Gratuit
             </Link>
             <button
               onClick={() => setShowDemo(!showDemo)}
@@ -189,7 +189,7 @@ export default function LandingPage() {
               href="/register"
               className="block w-full bg-white text-blue-700 text-center py-3 rounded-lg font-bold text-lg hover:bg-blue-50 transition"
             >
-              Incepe cu 14 Zile Gratuit
+              Incepe cu 3 Zile Gratuit
             </Link>
             <p className="text-center text-blue-200 text-sm mt-3">
               Nu necesita card pentru perioada de proba

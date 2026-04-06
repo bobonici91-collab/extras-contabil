@@ -54,7 +54,7 @@ export default function SubscriptionPage() {
           </span>
         </div>
         <p className="text-gray-600 text-sm mb-4">
-          Beneficiezi de acces complet la toate functiile aplicatiei pentru 14 zile.
+          Beneficiezi de acces la functiile aplicatiei pentru 3 zile (max 3 fisiere).
         </p>
         <button
           onClick={handleManage}

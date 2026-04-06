@@ -3,6 +3,11 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
 import { signToken } from '@/lib/auth/config';
 
+// Configurare perioada de proba (zile)
+const TRIAL_DAYS = 3;
+// Numar maxim de fisiere in perioada de proba
+export const TRIAL_MAX_FILES = 3;
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -10,6 +15,16 @@ export async function POST(request: Request) {
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: 'Toate campurile obligatorii trebuie completate.' }, { status: 400 });
+    }
+
+    if (!companyName || !cui) {
+      return NextResponse.json({ error: 'Numele firmei si CUI-ul sunt obligatorii.' }, { status: 400 });
+    }
+
+    // Validare format CUI (RO + cifre sau doar cifre, 2-10 cifre)
+    const cuiClean = cui.replace(/^RO/i, '').replace(/\s/g, '');
+    if (!/^\d{2,10}$/.test(cuiClean)) {
+      return NextResponse.json({ error: 'CUI invalid. Introduceti un CUI valid (ex: RO12345678 sau 12345678).' }, { status: 400 });
     }
 
     if (password.length < 8) {
@@ -22,23 +37,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Exista deja un cont cu aceasta adresa de email.' }, { status: 409 });
     }
 
+    // Check if CUI already used (prevent multiple trial accounts per company)
+    const existingCui = await prisma.user.findFirst({ where: { cui: cuiClean } });
+    if (existingCui) {
+      return NextResponse.json({ error: 'Exista deja un cont inregistrat cu acest CUI. Contactati-ne daca aveti nevoie de acces.' }, { status: 409 });
+    }
+
     // Hash password
     const passwordHash = await bcrypt.hash(password, 12);
 
-    // Create user
+    // Create user (store CUI without RO prefix, normalized)
     const user = await prisma.user.create({
       data: {
         name,
         email,
         passwordHash,
         companyName: companyName || null,
-        cui: cui || null,
+        cui: cuiClean,
       },
     });
 
     // Create trial subscription
     const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 14);
+    trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS);
 
     await prisma.subscription.create({
       data: {

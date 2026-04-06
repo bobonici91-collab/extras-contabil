@@ -25,7 +25,7 @@ CUM SE IMPORTA IN SAGA:
 ABONAMENT:
 - 500 RON / luna / firma de contabilitate
 - Fisiere nelimitate
-- 14 zile gratuit
+- 3 zile gratuit (max 3 fisiere in proba)
 - Anulare oricand din pagina Abonament
 
 Raspunde intotdeauna in limba romana. Fii concis, prietenos si util. Daca nu stii raspunsul, spune-le utilizatorilor sa contacteze suportul.`;
@@ -117,7 +117,7 @@ function getOfflineResponse(message: string): string {
     return 'Eroarea de sold apare cand: Sold initial + Total credite - Total debituri ≠ Sold final\n\nAceasta inseamna ca unele tranzactii lipsesc sau au sume incorecte. Verificati:\n1. Ca nu au fost sterse tranzactii din previzualizare\n2. Ca sumele de debit si credit sunt corecte\n3. Ca fisierul original contine toate tranzactiile perioadei';
   }
   if (lower.includes('pret') || lower.includes('abonament') || lower.includes('cost')) {
-    return 'ExtrasContabil costa 500 RON / luna / firma de contabilitate, cu:\n\n- Fisiere nelimitate\n- Toate cele 9 banci suportate\n- 14 zile gratuit la inregistrare\n- Anulare oricand\n\nAcceseaza pagina Abonament din meniu pentru a activa sau gestiona abonamentul.';
+    return 'ExtrasContabil costa 500 RON / luna / firma de contabilitate, cu:\n\n- Fisiere nelimitate\n- Toate cele 9 banci suportate\n- 3 zile gratuit la inregistrare (max 3 fisiere)\n- Anulare oricand\n\nAcceseaza pagina Abonament din meniu pentru a activa sau gestiona abonamentul.';
   }
 
   return 'Sunt asistentul ExtrasContabil! Te pot ajuta cu:\n\n- Cum sa importi fisierul in SAGA\n- Ce formate de fisiere sunt suportate\n- Cum sa editezi tranzactiile\n- De ce nu poti exporta\n- Informatii despre erori de validare\n- Detalii despre abonament\n\nCe doresti sa afli?';

@@ -71,7 +71,7 @@ export default function RegisterPage() {
 
         <div className="bg-white rounded-xl shadow-sm border p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Inregistrare</h1>
-          <p className="text-gray-500 text-sm mb-6">14 zile gratuit, fara obligatii</p>
+          <p className="text-gray-500 text-sm mb-6">3 zile gratuit, fara obligatii</p>
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>
@@ -98,9 +98,10 @@ export default function RegisterPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">CUI Firma</label>
-              <input type="text" value={form.cui} onChange={e => updateField('cui', e.target.value)}
+              <input type="text" value={form.cui} onChange={e => updateField('cui', e.target.value)} required
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                 placeholder="RO12345678" />
+              <p className="text-xs text-gray-400 mt-1">Obligatoriu. Un singur cont per CUI.</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Parola (minim 8 caractere)</label>
